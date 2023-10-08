@@ -76,8 +76,16 @@ public class RabbitmqMessageConsumer {
         log.info("publish-subscribe sms consumed message: {},channel:{}", message, channel);
     }
 
-    @RabbitListener(queues = RabbitMQConsumerConfig.PRIORITY_QUEUE)
+    /**
+     * priority queue + concurrent consumers
+     *
+     * @param message
+     * @param channel
+     * @throws IOException
+     */
+    @RabbitListener(queues = RabbitMQConsumerConfig.PRIORITY_QUEUE, containerFactory = "customContainerFactory")
     public void priorityMessage(Message message, Channel channel) throws IOException {
         log.info("priority queue consumed message: {},channel:{}", message, channel);
+        log.info("thread id:{},thread name:{}", Thread.currentThread().getId(), Thread.currentThread().getName());
     }
 }

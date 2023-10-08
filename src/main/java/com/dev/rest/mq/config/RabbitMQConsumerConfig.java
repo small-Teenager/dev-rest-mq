@@ -58,4 +58,19 @@ public class RabbitMQConsumerConfig {
 
     /*-------dlx queue---------*/
     public static final String DLX_QUEUE_NAME = "dlx_queue_name";
+
+    /*-------Concurrent Consumers---------*/
+
+    //并发数量:根据实际的服务器性能进行配置
+    public static final int DEFAULT_CONCURRENT = Runtime.getRuntime().availableProcessors() + 1;
+
+    @Bean("customContainerFactory")
+    public SimpleRabbitListenerContainerFactory containerFactory(SimpleRabbitListenerContainerFactoryConfigurer configurer,
+                                                                 ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConcurrentConsumers(DEFAULT_CONCURRENT);
+        factory.setMaxConcurrentConsumers(DEFAULT_CONCURRENT);
+        configurer.configure(factory, connectionFactory);
+        return factory;
+    }
 }
