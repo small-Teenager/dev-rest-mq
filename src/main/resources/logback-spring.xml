@@ -2,7 +2,7 @@
 <configuration>
 
     <springProperty scope="context" name="logPath" source="spring.application.name"/>
-<!--    <property name="LOG_HOME" value="/logs/${logPath}"/>-->
+    <property name="LOG_HOME" value="logs/${logPath}"/>
 
 
     <!-- 彩色日志 -->
