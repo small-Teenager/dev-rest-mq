@@ -23,15 +23,16 @@ public class RabbitmqMessageConsumer {
      * 通过brokerContainerFactory获取到对应的queue
      */
     @RabbitListener(queues = "QUEUE_NAME", containerFactory = "brokerContainerFactory")
-    public void onMessage(Message message, Channel channel) throws Exception {
+    public void onMessage(Message message, Channel channel) throws IOException {
         log.info("Consumed message: {},channel:{}", message, channel);
+        MessageDTO dto = parse(new String(message.getBody()), MessageDTO.class);
+        log.info("Consumed message content: {}", dto);
         try {
-            MessageDTO dto = parse(new String(message.getBody()), MessageDTO.class);
-            log.info("Consumed message content: {}", dto);
             // 由于之前配置的手动ack，需要手动回调rabbitMQ服务器，通知已经完成消费
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-        } catch (Exception e) {
-            log.error("Consumed error:{}", e);
+        } catch (IOException e) {
+            log.error("Consumed IOException:{}", e.getMessage());
+            e.printStackTrace();
             // 由于之前配置的手动ack，需要手动回调rabbitMQ服务器，通知出现问题
             channel.basicReject(message.getMessageProperties().getDeliveryTag(), true);
         }
@@ -84,7 +85,7 @@ public class RabbitmqMessageConsumer {
      * @throws IOException
      */
     @RabbitListener(queues = RabbitMQConsumerConfig.PRIORITY_QUEUE, containerFactory = "customContainerFactory")
-    public void priorityMessage(Message message, Channel channel) throws IOException {
+    public void priorityMessage(Message message, Channel channel) {
         log.info("priority queue consumed message: {},channel:{}", message, channel);
         log.info("thread id:{},thread name:{}", Thread.currentThread().getId(), Thread.currentThread().getName());
     }
